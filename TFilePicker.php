@@ -71,6 +71,19 @@
 
 		$structure=$this->getSubdirectoriesTree(getcwd().$this->directory);
 		$value=CHtml::resolveValue($this->model, $this->attribute);
-		echo $this->toStringTree($structure, $name, $fileViewPath, $value);
+		echo '<div id="'.$id.'">'.
+			$this->toStringTree($structure, $name, $fileViewPath, $value).'</div>';
+
+		// JS
+		$cs = Yii::app()->getClientScript();
+		$assets = Yii::app()->getAssetManager()->publish(dirname(__FILE__).
+			'/assets', false, -1, true);
+		$cs->registerScriptFile($assets . '/nodeToggle.js');
+
+		$jscode="niezgoda.filePicker.nodeToggle('".$id.
+			"', '.filePicker.button.toggle', '.filePicker.children.list', ".
+			"'.filePicker.node');";
+
+		Yii::app()->getClientScript()->registerScript(__CLASS__ . '#' . $id, $jscode);
 	}
 }
