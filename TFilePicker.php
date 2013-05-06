@@ -27,25 +27,25 @@
 	}
 
 	private function toStringTree($directoriesTree, $name, $nodeTemplatePath, 
-			$mustache, $selectedBranch=null, $currentBranch="."){
+			$selectedBranch=null, $currentBranch="."){
 
 		$result='';
 		foreach($directoriesTree as $directoryName=>$contents){
 			$subBranch=$currentBranch.'/'.$directoryName;
 
-			$preRender=$this->controller->renderFile($nodeTemplatePath, array(
+			if($contents){
+				$subRender=$this->toStringTree($contents, $name, $nodeTemplatePath, 
+					$selectedBranch, $subBranch);
+			}else{
+				$subRender='';
+			}
+			$result.=$this->controller->renderFile($nodeTemplatePath, array(
 				'fileName'=>$directoryName,
 				'name'=>$name,
 				'value'=>$subBranch,
 				'selected'=>$selectedBranch==$subBranch,
+				'children'=>$subRender,
 			), true);
-			if($contents){
-				$subRender=$this->toStringTree($contents, $name, $nodeTemplatePath, 
-					$mustache, $selectedBranch, $subBranch);
-			}else{
-				$subRender='';
-			}
-			$result.=$mustache->render($preRender, array('children'=>$subRender));
 		}
 		return $result;
 	}
@@ -56,26 +56,6 @@
 		}
 
 		list($name, $id) = $this->resolveNameId();
-
-		$mustachePathAlias='ext.TFilePicker.mustache.src.Mustache';
-
-		spl_autoload_unregister(array('YiiBase','autoload'));
-
-		require Yii::getPathOfAlias($mustachePathAlias).
-			'/Autoloader.php';
-		Mustache_Autoloader::register(Yii::getPathOfAlias($mustachePathAlias).
-			DIRECTORY_SEPARATOR.'..');
-
-		spl_autoload_register(array('YiiBase','autoload'));
-
-		$mustache = new Mustache_Engine(array(
-			'charset' => Yii::app()->charset,
-			'cache' => Yii::app()->getRuntimePath().DIRECTORY_SEPARATOR.'Mustache'.
-				DIRECTORY_SEPARATOR.'cache',
-			'escape' => function($value) {
-      	return CHtml::encode($value);
-      },
-		));
 
 		if(!isset($this->itemView)){
 			// use default view for rendering tree nodes, located inside this 
@@ -91,7 +71,6 @@
 
 		$structure=$this->getSubdirectoriesTree(getcwd().$this->directory);
 		$value=CHtml::resolveValue($this->model, $this->attribute);
-		echo $this->toStringTree($structure, $name, $fileViewPath, $mustache, 
-			$value);
+		echo $this->toStringTree($structure, $name, $fileViewPath, $value);
 	}
 }

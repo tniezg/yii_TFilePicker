@@ -3,10 +3,10 @@
 		<i class="icon-folder-close"></i>
 	</a>
 	<div class="media-body">
-		<h5 class="media-heading"><?php print_r($fileName); ?>
+		<h5 class="media-heading"><?php echo $fileName; ?>
 		<?php echo CHtml::radioButton($name, $selected, array(
 				'value'=>$value)); ?>
 		</h5>
-		{{{children}}}
+		<?php echo $children ?>
 	</div>
 </div>
