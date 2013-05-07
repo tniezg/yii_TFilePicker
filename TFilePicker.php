@@ -82,7 +82,7 @@
 
 		$jscode="niezgoda.filePicker.nodeToggle('".$id.
 			"', '.filePicker.button.toggle', '.filePicker.children.list', ".
-			"'.filePicker.node');";
+			"'.filePicker.node','".$value."');";
 
 		Yii::app()->getClientScript()->registerScript(__CLASS__ . '#' . $id, $jscode);
 	}
